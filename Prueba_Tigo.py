@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
     # getting pokemon names
     name = get_names(nr())
-
+    name=[]
     # obtaining the different data of the pokemons
 
     for i in range(len(name)):
@@ -209,7 +209,7 @@ if __name__ == "__main__":
                 result[j[0]] += j[1]
 
     max_key = max(result, key=result.get)
-    consult_two=[[f"The type that is most repeated among the Pokemons is: {max_key}, with {result[max_key]} times"]]
+    consult_two=[[f"The type that is most repeated among the Pokemons is: {max_key}, with {result[max_key]} repeat"]]
 
     #Generating the .CSV file
     with open('results.csv','w', newline='') as file:
@@ -217,3 +217,6 @@ if __name__ == "__main__":
         writer.writerows(consult_one)
         writer.writerows(consult_two)
         file.close()
+
+    print(consult_one)
+    print(consult_two)
