@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
     # getting pokemon names
     name = get_names(nr())
-    name=[]
+    
     # obtaining the different data of the pokemons
 
     for i in range(len(name)):
