@@ -105,6 +105,14 @@ def insertRow(name_db, name_T, data):
     conn.close()
 
 
+def insertRows(name_db, name_T, data):
+    conn = sql.connect(f"{name_db}.db")
+    cursor = conn.cursor()
+    cursor.executemany(f"insert into {name_T} values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",data)
+    conn.commit()
+    conn.close()
+
+
 def updateRow(name_bd, name_T, data):
     conn = sql.connect(f"{name_bd}.db")
     cursor = conn.cursor()
@@ -125,6 +133,13 @@ def read(name_bd, name_T):
     conn.commit()
     conn.close()
     return Type_I
+
+def delete(name_bd, name_T):
+    conn = sql.connect(f"{name_bd}.db")
+    cursor = conn.cursor()
+    cursor.execute(f"delete from {name_T}")
+    conn.commit()
+    conn.close()
 
 
 def types_pokemons(types):
@@ -161,6 +176,7 @@ if __name__ == "__main__":
 
     # getting pokemon names
     name = get_names(nr())
+    save_data = []
     
     # obtaining the different data of the pokemons
 
@@ -176,47 +192,39 @@ if __name__ == "__main__":
         while len(type) < 3:
             type.append("")
 
-        # false initializing the function to update the BBDD
-        update = False
-
         # Taking the data to enter the BBDD
-        save_data = [i + 1, name[i], imagen, ability, stats, type]
+        save_data.append([i + 1, name[i], imagen, ability[0],ability[1], stats[0],stats[1],stats[2],stats[3],stats[4],stats[5], type[0],type[1], type[2]])
 
-        try:
-            # Entering the data into the DB
-            insertRow(name_BBDD, name_T, save_data)
-        except sql.IntegrityError:
-            # Activate the update of the data in case they had already been entered
-            update = True
-        if update:
-            # Update existing database
-            updateRow(name_BBDD, name_T, save_data)
+    delete(name_BBDD, name_T)
+    insertRows(name_BBDD,name_T,save_data)
 
-    #Querying the pokemons that have more than 2 types
-    types = read(name_BBDD, name_T)
-    pokemons_2 = types_pokemons(types)
-    consult_one=[["Pokemon you have more than two types: " + str(len(pokemons_2))],pokemons_2]
 
-    #Performing query of the type that is repeated the most
-    columns = ["Type_I", "Type_II", "Type_III"]
-    for i in range(len(columns)):
-        if i == 0:
-            one = types_repet(name_BBDD, name_T, f"{columns[i]}")
-            result = dict(one)
-        else:
-            one = types_repet(name_BBDD, name_T, f"{columns[i]}")
-            for j in one:
-                result[j[0]] += j[1]
 
-    max_key = max(result, key=result.get)
-    consult_two=[[f"The type that is most repeated among the Pokemons is: {max_key}, with {result[max_key]} repeat"]]
-
-    #Generating the .CSV file
-    with open('results.csv','w', newline='') as file:
-        writer=csv.writer(file, delimiter=';')
-        writer.writerows(consult_one)
-        writer.writerows(consult_two)
-        file.close()
-
-    print(consult_one)
-    print(consult_two)
+    # #Querying the pokemons that have more than 2 types
+    # types = read(name_BBDD, name_T)
+    # pokemons_2 = types_pokemons(types)
+    # consult_one=[["Pokemon you have more than two types: " + str(len(pokemons_2))],pokemons_2]
+    #
+    # #Performing query of the type that is repeated the most
+    # columns = ["Type_I", "Type_II", "Type_III"]
+    # for i in range(len(columns)):
+    #     if i == 0:
+    #         one = types_repet(name_BBDD, name_T, f"{columns[i]}")
+    #         result = dict(one)
+    #     else:
+    #         one = types_repet(name_BBDD, name_T, f"{columns[i]}")
+    #         for j in one:
+    #             result[j[0]] += j[1]
+    #
+    # max_key = max(result, key=result.get)
+    # consult_two=[[f"The type that is most repeated among the Pokemons is: {max_key}, with {result[max_key]} repeat"]]
+    #
+    # #Generating the .CSV file
+    # with open('results.csv','w', newline='') as file:
+    #     writer=csv.writer(file, delimiter=';')
+    #     writer.writerows(consult_one)
+    #     writer.writerows(consult_two)
+    #     file.close()
+    #
+    # print(consult_one)
+    # print(consult_two)
