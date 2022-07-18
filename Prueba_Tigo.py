@@ -41,6 +41,21 @@ def get_names(nr):
     return names
 
 
+def get_type():
+    url = "https://pokeapi.co/api/v2/type/"
+    response = requests.get(url)
+    type = []
+
+    if response.status_code == 200:
+        data = response.json()
+        results = data.get('results')
+
+        if results:
+            for types in results:
+                type.append(types['name'])
+    return type
+
+
 def get_data(names):
     url = f"https://pokeapi.co/api/v2/pokemon/{names}/"
     data = requests.get(url)
@@ -199,32 +214,32 @@ if __name__ == "__main__":
     insertRows(name_BBDD,name_T,save_data)
 
 
+    #Querying the pokemons that have more than 2 types
+    types = read(name_BBDD, name_T)
+    pokemons_2 = types_pokemons(types)
+    consult_one=[["Pokemon you have more than two types: " + str(len(pokemons_2))],pokemons_2]
 
-    # #Querying the pokemons that have more than 2 types
-    # types = read(name_BBDD, name_T)
-    # pokemons_2 = types_pokemons(types)
-    # consult_one=[["Pokemon you have more than two types: " + str(len(pokemons_2))],pokemons_2]
-    #
-    # #Performing query of the type that is repeated the most
-    # columns = ["Type_I", "Type_II", "Type_III"]
-    # for i in range(len(columns)):
-    #     if i == 0:
-    #         one = types_repet(name_BBDD, name_T, f"{columns[i]}")
-    #         result = dict(one)
-    #     else:
-    #         one = types_repet(name_BBDD, name_T, f"{columns[i]}")
-    #         for j in one:
-    #             result[j[0]] += j[1]
-    #
-    # max_key = max(result, key=result.get)
-    # consult_two=[[f"The type that is most repeated among the Pokemons is: {max_key}, with {result[max_key]} repeat"]]
-    #
-    # #Generating the .CSV file
-    # with open('results.csv','w', newline='') as file:
-    #     writer=csv.writer(file, delimiter=';')
-    #     writer.writerows(consult_one)
-    #     writer.writerows(consult_two)
-    #     file.close()
-    #
-    # print(consult_one)
-    # print(consult_two)
+
+    #Performing query of the type that is repeated the most
+    name_type=get_type()
+    valor=[0]*len(name_type)
+    types={name_type:valor for (name_type,valor) in zip(name_type,valor)}
+
+    columns = ["Type_I", "Type_II", "Type_III"]
+    for i in range(len(columns)):
+        one = types_repet(name_BBDD, name_T, f"{columns[i]}")
+        for j in one:
+            types[j[0]]+=j[1]
+
+    max_key = max(types, key=types.get)
+    consult_two=[[f"The type that is most repeated among the Pokemons is: {max_key}, with {types[max_key]} repeat"]]
+
+    #Generating the .CSV file
+    with open('results.csv','w', newline='') as file:
+        writer=csv.writer(file, delimiter=';')
+        writer.writerows(consult_one)
+        writer.writerows(consult_two)
+        file.close()
+
+    print(consult_one)
+    print(consult_two)
